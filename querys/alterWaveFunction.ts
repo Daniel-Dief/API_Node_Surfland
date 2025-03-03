@@ -4,7 +4,10 @@ function queryGetProduct(searchMethod : string) {
                 sp.ProductId,
                 p2.Name as ClientName,
                 p.Name as WaveName,
-                p.WaveLevel as WaveLevel,
+                CASE
+                    WHEN p.WaveLevel = 1 THEN 'Bay'
+                    WHEN p.WaveLevel = 2 THEN 'Reef'
+                END WaveLevel,
                 s.Name as Time,
                 s.ScheduleId,
                 sp.Date as 'Date',
