@@ -7,6 +7,14 @@ import { changeProduct } from "../../types/log";
 import { Log } from "../../utils";
 import mysql from "mysql2/promise";
 import apiSheduleRequest from "../CodeChange/apiPortal"
+import {
+  queryCartByLocator,
+  queryCheckIsAdmin,
+  queryCheckHasPermission,
+  querySimpleGetProduct,
+  queryUpdateProduct,
+  queryGetProduct
+} from "../../querys/alterWaveFunction"
 
 // Function to fetch schedules from the database
 function getShedulesByDate(app : express.Application) {
@@ -39,29 +47,7 @@ function getProductByBarcode(app : express.Application) {
     
       try {
         await sql.connect(dbConfigPortal);
-        const result = await sql.query(`
-          SELECT
-            sp.ProductId,
-            p2.Name as ClientName,
-            p.Name as WaveName,
-            p.WaveLevel as WaveLevel,
-            s.Name as Time,
-            s.ScheduleId,
-            sp.Date as 'Date',
-            sp.Used as 'Used'
-          FROM
-            SalesProducts sp
-          INNER JOIN Sales sl ON
-            sl.SaleId = sp.SaleId
-          INNER JOIN Products p ON
-            sp.ProductId = p.ProductId
-          INNER JOIN Schedules s ON
-            s.ScheduleId = sp.ScheduleId
-          INNER JOIN SalesProductsClients p2 ON
-            p2.SaleProductId = sp.SaleProductId
-          WHERE
-            sp.token = '${searchMethod}'
-        `);
+        const result = await sql.query(queryGetProduct(searchMethod));
     
         res.json(result.recordset);
       } catch (error) {
@@ -87,16 +73,7 @@ function postUpdateProduct(app : express.Application) {
       try {
         await sql.connect(dbConfigPortal);
     
-        const requestProduct = await sql.query(`
-          SELECT
-            sp.ProductId,
-            sp.ScheduleId,
-            sp.Date
-          FROM
-            SalesProducts sp
-          WHERE
-            sp.Token = '${searchMethod}'
-        `);
+        const requestProduct = await sql.query(querySimpleGetProduct(searchMethod));
       
         const oldProduct : changeProduct = {
           searchMethod: searchMethod,
@@ -112,18 +89,7 @@ function postUpdateProduct(app : express.Application) {
           date: date
         }
     
-        await sql.query(`
-          UPDATE
-            SalesProducts
-          SET
-            ProductId = ${product_id},
-            ScheduleId = ${schedule_id},
-            Date = '${date}'
-          WHERE
-            Token = '${searchMethod}'
-            OR
-            SaleProductId = '${searchMethod}';
-        `);
+        await sql.query(queryUpdateProduct(searchMethod, product_id, schedule_id, date));
     
         await Log(usrDocument, oldProduct, newProduct);
     
@@ -141,21 +107,7 @@ function postCheckAccess(app : express.Application) {
       const connection = await mysql.createConnection(dbConfigIntranet)
       const { functionId, usrLogin, usrPassword } = req.body;
     
-      const [adminRows] = await connection.execute(
-        `
-          SELECT
-            COUNT(u.PersonId) AS result 
-          FROM
-            Users u 
-          WHERE
-            u.Login = ? 
-            AND
-            u.Password = ? 
-            AND
-            u.AccessProfileId = 10
-        `,
-        [usrLogin, usrPassword]
-      )
+      const [adminRows] = await connection.execute(queryCheckIsAdmin(usrLogin, usrPassword));
     
       if((adminRows as any)[0]?.result === 1) {
         res.status(200).json({
@@ -165,25 +117,7 @@ function postCheckAccess(app : express.Application) {
         return;
       }
     
-      const [rows] = await connection.execute(
-        `
-          SELECT
-            COUNT(u.PersonId) AS result 
-          FROM
-            Users u 
-          INNER JOIN
-            Permissions p
-          ON
-            u.AccessProfileId = p.AccessProfileId 
-          WHERE
-            u.Login = ? 
-            AND
-            u.Password = ? 
-            AND
-            p.FunctionId = ?
-        `,
-        [usrLogin, usrPassword, functionId]
-      );
+      const [rows] = await connection.execute(queryCheckHasPermission(usrLogin, usrPassword, functionId));
     
       await connection.end();
     
@@ -218,26 +152,7 @@ function getCartByLocator(app : express.Application) {
         const clientTravel = new Client(dbConfigTravel);
         await clientTravel.connect();
         
-        const result = await clientTravel.query(`
-        SELECT
-          ci.conta_id AS "ContaId",
-          ci.produto AS "Nome",
-          ci.codigobarras AS "QRCode",
-          ci.dataprevista AS "Data",
-          ci.horario AS "Horario",
-          CASE
-            WHEN ci.databaixa is null THEN 0
-            WHEN ci.databaixa is not null THEN 1
-          END AS "Utilizado"
-        FROM
-          contas_ingressos ci
-        INNER JOIN
-          contas c 
-        ON
-          ci.conta_id = c.id
-        WHERE 
-          c.localizador = '${locator}'
-        `);
+        const result = await clientTravel.query(queryCartByLocator(locator));
         await clientTravel.end();
     
         res.json(result.rows);
