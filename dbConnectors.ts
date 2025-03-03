@@ -21,7 +21,7 @@ const dbConfigPortal = {
 
 const dbConfigTravel = {
     host: process.env.DB_TRAVEL_HOST ?? "",
-    port: process.env.DB_TRAVEL_PORT ?? "",
+    port: Number(process.env.DB_TRAVEL_PORT ?? ""),
     user: process.env.DB_TRAVEL_USER ?? "",
     password: process.env.DB_TRAVEL_PASSWORD ?? "",
     database: process.env.DB_TRAVEL_DATABASE ?? "",
