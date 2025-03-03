@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "start": "npx ts-node server.ts",
+    "dev": "nodemon --exec npx ts-node server.ts"
+  },
   "dependencies": {
     "@types/pg": "^8.11.11",
     "axios": "^1.7.9",
@@ -15,6 +19,7 @@
     "@types/express": "^5.0.0",
     "@types/mssql": "^9.1.6",
     "@types/node": "^22.13.1",
+    "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }
