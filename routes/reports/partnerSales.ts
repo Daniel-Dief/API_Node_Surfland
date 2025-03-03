@@ -2,7 +2,7 @@ import express from "express";
 import mssql from "mssql";
 import { formatarDataSQL } from "../../utils";
 import { dbConfigPortal } from "../../dbConnectors";
-import { queryPartnersReport } from "../../queryString";
+import { queryPartnersReport } from "../../querys/partnerSalesReport";
 
 function getPartnerSales(app : express.Application) {
   app.get("/reports/partnerSales", async (req, res) => {

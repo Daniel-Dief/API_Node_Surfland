@@ -1,7 +1,7 @@
 import express from "express";
 import mssql from "mssql";
 import { dbConfigPortal } from "../dbConnectors";
-import { queryPaymentMethods }  from "../queryString";
+import { queryPaymentMethods }  from "../querys/partnerSalesReport";
 
 function getPaymentMethods (app : express.Application) {
   app.get("/fixeds/paymentMethods", async (req, res) => {
