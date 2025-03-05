@@ -96,6 +96,7 @@ function queryPartnersReport({ paymentMethod, saleDate, saleDateEnd, partnerName
         pp.ProductId = p4.ProductId
       WHERE
         pt.ProductTypeId NOT IN (2, 6)
+        AND s.StatusId = 4
         ${
           paymentMethod ? `AND pm.Name = '${paymentMethod}'` : ''
         }
