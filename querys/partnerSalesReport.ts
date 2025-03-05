@@ -57,6 +57,7 @@ function queryPartnersReport({ paymentMethod, saleDate, saleDateEnd, partnerName
             WHEN p3.Name LIKE '%Surf Pool Training%' THEN 'Surf Pool Training'
             WHEN p3.Name LIKE '%Burle Experience%' THEN 'Burle Experience'
             WHEN p3.Name LIKE '%Camomile Massagem%' THEN 'Camomile Massagem'
+            WHEN p3.Name LIKE '%Aprimore Surf%' THEN 'Aprimore Surf'
             WHEN pt3.Name LIKE '%CT Surfland%' THEN 'CT Surfland'
             ELSE 'Outros'
             END AS "Partner"
