@@ -105,6 +105,8 @@ function queryPartnersReport({ paymentMethod, saleDate, saleDateEnd, partnerName
         ${
           partnerName ? `AND p4.Partner = '${partnerName}'` : ''
         }
+      ORDER BY
+        s.SaleId
     `;
 }
 
