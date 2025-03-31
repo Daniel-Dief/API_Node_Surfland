@@ -24,6 +24,8 @@ function queryGetProduct(searchMethod : string) {
                 p2.SaleProductId = sp.SaleProductId
             WHERE
                 sp.token = '${searchMethod}'
+                AND
+                sp.StatusId = 4
         `
 }
 
@@ -37,34 +39,36 @@ function querySimpleGetProduct(searchMethod : string) {
                 SalesProducts sp
             WHERE
                 sp.Token = '${searchMethod}'
+                AND
+                sp.StatusId = 4
         `
 }
 
 function queryUpdateProduct(searchMethod : string, product_id : number, schedule_id : number, date : string) {
     return `
-            UPDATE
-                SalesProducts
-            SET
-                ProductId = ${product_id},
-                ScheduleId = ${schedule_id},
-                Date = '${date}'
-            WHERE
-                Token = '${searchMethod}'
-            OR
-                SaleProductId = '${searchMethod}';
+        UPDATE
+            SalesProducts
+        SET
+            ProductId = ${product_id},
+            ScheduleId = ${schedule_id},
+            Date = '${date}'
+        WHERE
+            Token = '${searchMethod}'
+            AND
+            StatusId = 4
         `
 }
 
 function queryCheckHasPermission(usrLogin : string, usrPassword : string, functionId : string) {
     return `
             SELECT
-                COUNT(u.PersonId) AS result 
+                COUNT(u.PersonId) AS result
             FROM
-                Users u 
+                Users u
             INNER JOIN
                 Permissions p
             ON
-                u.AccessProfileId = p.AccessProfileId 
+                u.AccessProfileId = p.AccessProfileId
             WHERE
                 u.Login = '${usrLogin}'
             AND
@@ -77,13 +81,13 @@ function queryCheckHasPermission(usrLogin : string, usrPassword : string, functi
 function queryCheckIsAdmin(usrLogin : string, usrPassword : string) {
     return `
             SELECT
-                COUNT(u.PersonId) AS result 
+                COUNT(u.PersonId) AS result
             FROM
-                Users u 
+                Users u
             WHERE
-                u.Login = '${usrLogin}' 
+                u.Login = '${usrLogin}'
             AND
-                u.Password = '${usrPassword}' 
+                u.Password = '${usrPassword}'
             AND
                 u.AccessProfileId = 10
         `
@@ -104,10 +108,10 @@ function queryCartByLocator(locator: string){
         FROM
             contas_ingressos ci
         INNER JOIN
-            contas c 
+            contas c
         ON
             ci.conta_id = c.id
-        WHERE 
+        WHERE
             c.localizador = '${locator}'
         `
 }
