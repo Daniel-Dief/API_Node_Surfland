@@ -17,7 +17,7 @@ function formatarDataSQL(data: string | string[] | Date | ParsedQs | (string | P
 }
 
 // Função para salvar log no Banco de Dados
-async function Log(usrDocument : string, oldProduct : changeProduct, newProduct : changeProduct) {
+async function alterWaveLog(usrDocument : string, oldProduct : changeProduct, newProduct : changeProduct) {
     const connection = await mysql.createConnection(dbConfigIntranet);
     const [rows] = await connection.execute(
       `SELECT UserId FROM Users WHERE Login = ?`,
@@ -33,9 +33,9 @@ async function Log(usrDocument : string, oldProduct : changeProduct, newProduct 
     const str_newProduct = JSON.stringify(newProduct);
   
     await connection.execute(
-      `INSERT INTO Logs (UserId, OldJSON, NewJSON) VALUES (?, ?, ?)`,
+      `INSERT INTO Logs (UserId, OldJSON, NewJSON) VALUES (?, ?, ?, 14)`,
       [userId, str_oldProduct, str_newProduct]
     );
   }
 
-export { formatarDataSQL, Log };
+export { formatarDataSQL, alterWaveLog };

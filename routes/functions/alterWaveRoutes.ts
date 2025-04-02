@@ -4,7 +4,7 @@ import { Client } from "pg";
 import { dbConfigPortal, dbConfigIntranet, dbConfigTravel } from "../../dbConnectors";
 import { authenticateToken } from "../../auth";
 import { changeProduct } from "../../types/log";
-import { Log } from "../../utils";
+import { alterWaveLog } from "../../utils";
 import mysql from "mysql2/promise";
 import apiSheduleRequest from "../CodeChange/apiPortal"
 import {
@@ -91,7 +91,7 @@ function postUpdateProduct(app : express.Application) {
     
         await sql.query(queryUpdateProduct(searchMethod, product_id, schedule_id, date));
     
-        await Log(usrDocument, oldProduct, newProduct);
+        await alterWaveLog(usrDocument, oldProduct, newProduct);
     
         res.json({ success: true });
       } catch (error) {
