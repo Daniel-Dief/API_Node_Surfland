@@ -33,7 +33,7 @@ async function alterWaveLog(usrDocument : string, oldProduct : changeProduct, ne
     const str_newProduct = JSON.stringify(newProduct);
   
     await connection.execute(
-      `INSERT INTO Logs (UserId, OldJSON, NewJSON) VALUES (?, ?, ?, 14)`,
+      `INSERT INTO Logs (UserId, OldJSON, NewJSON, FunctionId) VALUES (?, ?, ?, 14)`,
       [userId, str_oldProduct, str_newProduct]
     );
   }
