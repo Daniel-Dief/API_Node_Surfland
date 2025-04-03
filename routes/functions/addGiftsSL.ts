@@ -11,6 +11,7 @@ import {
     checkGiftsId
 } from "../../querys/addGiftsFunction"
 import { insertProps } from "../../types/slGifts"
+import { addGiftsSLLog } from "../../utils";
 
 // Função para listar todos os brindes disponiveis
 function getAllGifts(app : express.Application) {
@@ -128,18 +129,20 @@ function insertGifts(app : express.Application) {
       }
       
       let insertBody : insertProps | null = null;
+      let usrDocument : string | null = null;
 
       try {
         insertBody = {
           contractId: parseInt(req.body.contractId),
           giftsId: req.body.giftsId
         }
+        usrDocument = req.body.usrDocument;
       } catch (error) {
         console.error(error);
         res.status(400).json({ error: 'Corpo da requisição inválido' });
       }
 
-      if(!insertBody || !insertBody.contractId || insertBody.giftsId.length == 0) {
+      if(!insertBody || !insertBody.contractId || insertBody.giftsId.length == 0 || !usrDocument) {
         res.status(400).json({ error: 'Corpo da requisição inválido' });
         return
       }
@@ -158,7 +161,6 @@ function insertGifts(app : express.Application) {
         return
       }
 
-
       try {
         const clientSL = new Client(dbConfigSL);
         await clientSL.connect();
@@ -169,6 +171,8 @@ function insertGifts(app : express.Application) {
 
         await clientSL.end();
         
+        addGiftsSLLog(usrDocument, insertBody);
+
         res.status(200).json({
           success: true,
           message: 'Brindes adicionados ao contrato com sucesso!'

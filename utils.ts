@@ -2,6 +2,7 @@ import { ParsedQs } from 'qs';
 import mysql from 'mysql2/promise';
 import { dbConfigIntranet } from './dbConnectors';
 import { changeProduct } from './types/log';
+import { insertProps } from './types/slGifts';
 
 function formatarDataSQL(data: string | string[] | Date | ParsedQs | (string | ParsedQs)[] | undefined): string | undefined {
     if (data) { 
@@ -38,4 +39,30 @@ async function alterWaveLog(usrDocument : string, oldProduct : changeProduct, ne
     );
   }
 
-export { formatarDataSQL, alterWaveLog };
+// Função para salvar log no Banco de Dados
+async function addGiftsSLLog(usrDocument : string, insertBody: insertProps) {
+  const connection = await mysql.createConnection(dbConfigIntranet);
+  const [rows] = await connection.execute(
+    `SELECT UserId FROM Users WHERE Login = ?`,
+    [usrDocument]
+  );
+  const userId = (rows as any)[0]?.UserId ?? 0;
+  
+  if(userId == 0) {
+    console.log("Erro ao buscar usuário");
+  }
+
+  const str_oldJSON = JSON.stringify({});
+  const str_newJSON = JSON.stringify(insertBody);
+
+  await connection.execute(
+    `INSERT INTO Logs (UserId, OldJSON, NewJSON, FunctionId) VALUES (?, ?, ?, 17)`,
+    [userId, str_oldJSON, str_newJSON]
+  );
+}
+
+export {
+  formatarDataSQL,
+  alterWaveLog,
+  addGiftsSLLog
+};
