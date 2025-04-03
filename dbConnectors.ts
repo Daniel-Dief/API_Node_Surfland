@@ -27,4 +27,12 @@ const dbConfigTravel = {
     database: process.env.DB_TRAVEL_DATABASE ?? "",
 }
 
-export { dbConfigIntranet, dbConfigPortal, dbConfigTravel };
+const dbConfigSL = {
+    host: process.env.DB_SL_HOST ?? "",
+    port: Number(process.env.DB_SL_PORT ?? ""),
+    user: process.env.DB_SL_USER ?? "",
+    password: process.env.DB_SL_PASSWORD ?? "",
+    database: process.env.DB_SL_DATABASE ?? "",
+}
+
+export { dbConfigIntranet, dbConfigPortal, dbConfigTravel, dbConfigSL };
