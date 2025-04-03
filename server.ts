@@ -9,6 +9,12 @@ import {
   postCheckAccess,
   postUpdateProduct
 } from "./routes/functions/alterWaveRoutes";
+import {
+  getAllGifts,
+  getContract,
+  getGiftsByContract,
+  insertGifts
+} from "./routes/functions/addGiftsSL";
 
 const app = express();
 app.use(cors());
@@ -28,6 +34,12 @@ getCartByLocator(app);
 getProductByBarcode(app);
 postCheckAccess(app);
 postUpdateProduct(app);
+
+// Brindes do SL
+getAllGifts(app);
+getContract(app);
+getGiftsByContract(app);
+insertGifts(app);
 
 // Iniciar servidor
 app.listen(port, () => {
