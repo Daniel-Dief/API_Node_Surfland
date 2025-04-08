@@ -8,9 +8,10 @@ import {
     queryGetGiftsByContract,
     queryInsertGifts,
     checkContractId,
-    checkGiftsId
+    checkGiftsId,
+    queryGetAllGifts
 } from "../../querys/addGiftsFunction"
-import { contractInfos, insertProps } from "../../types/slGifts"
+import { contractInfos, formatGiftsLogs, giftsInfos, insertProps } from "../../types/slGifts"
 import { addGiftsSLLog, getHistoryGiftsSLLog } from "../../utils";
 
 // Função para listar todos os brindes disponiveis
@@ -67,23 +68,47 @@ function getContract(app : express.Application) {
         const clientSL = new Client(dbConfigSL);
         await clientSL.connect();
         
-        const result = await clientSL.query(
+        const contractResult = await clientSL.query(
           queryGetContract(formatcontractId)
         );
-        await clientSL.end();
     
-        const contractInfo = result.rows[0] as contractInfos;
+        const contractInfo = contractResult.rows[0] as contractInfos;
 
         if(!contractId) {
           res.status(400).json({ error: 'Contrato não encontrado' });
           return;
         }
 
-        if(logHistory) {
-          contractInfo.logHistory = logHistory;
+        if(!logHistory) {
+          res.json(contractInfo);
+          return;
         }
 
-        res.json(contractInfo);
+        const giftsResult = (await clientSL.query(
+          queryGetAllGifts()
+        )).rows as giftsInfos[];
+
+        const formatLogs = logHistory.map((log) => {
+          const giftsNames = log.JSON.giftsId.map((giftId: number) => {
+            const gift = giftsResult.find((gift) => gift.giftsid === giftId)
+            return gift ? gift.giftsname : '';
+          });
+
+          return {
+            Name: log.Name,
+            JSON: {
+              contractId: log.JSON.contractId,
+              giftsNames: giftsNames
+            },
+            ChangedAt: log.ChangedAt
+          }
+        })
+
+        contractInfo.logHistory = formatLogs;
+
+        res.status(200).json(contractInfo)
+
+        await clientSL.end();
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao listar as informações do contrato' });

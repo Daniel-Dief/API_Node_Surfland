@@ -5,7 +5,10 @@ export interface insertProps {
 
 export interface giftsLogs {
     Name: string;
-    JSON: string;
+    JSON: {
+        contractId: number;
+        giftsId: number[];
+    };
     ChangedAt: Date;
 }
 
@@ -15,5 +18,19 @@ export interface contractInfos {
     Clientname: string,
     Documento: string,
     Email: string
-    logHistory: giftsLogs[] | undefined
+    logHistory: formatGiftsLogs[] | undefined
+}
+
+export interface giftsInfos {
+    giftsid: number,
+    giftsname: string
+}
+
+export interface formatGiftsLogs {
+    Name: string;
+    JSON: {
+        contractId: number;
+        giftsNames: string[];
+    };
+    ChangedAt: Date;
 }

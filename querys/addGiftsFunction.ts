@@ -155,11 +155,22 @@ async function checkContractId(contractId : number) {
     }
 }
 
+function queryGetAllGifts() {
+    return `
+    SELECT
+        id as giftsId,
+        nome as giftsName
+    FROM
+        vendas.brinde
+    `
+}
+
 export {
     queryListAllGifts,
     queryGetContract,
     queryGetGiftsByContract,
     queryInsertGifts,
     checkGiftsId,
-    checkContractId
+    checkContractId,
+    queryGetAllGifts
 }
