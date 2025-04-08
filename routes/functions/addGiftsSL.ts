@@ -10,8 +10,8 @@ import {
     checkContractId,
     checkGiftsId
 } from "../../querys/addGiftsFunction"
-import { insertProps } from "../../types/slGifts"
-import { addGiftsSLLog } from "../../utils";
+import { contractInfos, insertProps } from "../../types/slGifts"
+import { addGiftsSLLog, getHistoryGiftsSLLog } from "../../utils";
 
 // Função para listar todos os brindes disponiveis
 function getAllGifts(app : express.Application) {
@@ -61,6 +61,8 @@ function getContract(app : express.Application) {
         return
       }
 
+      const logHistory = await getHistoryGiftsSLLog(formatcontractId);
+
       try {
         const clientSL = new Client(dbConfigSL);
         await clientSL.connect();
@@ -70,7 +72,18 @@ function getContract(app : express.Application) {
         );
         await clientSL.end();
     
-        res.json(result.rows);
+        const contractInfo = result.rows[0] as contractInfos;
+
+        if(!contractId) {
+          res.status(400).json({ error: 'Contrato não encontrado' });
+          return;
+        }
+
+        if(logHistory) {
+          contractInfo.logHistory = logHistory;
+        }
+
+        res.json(contractInfo);
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao listar as informações do contrato' });

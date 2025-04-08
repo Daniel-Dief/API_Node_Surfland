@@ -17,19 +17,49 @@ function queryListAllGifts() {
 
 function queryGetContract(contractId : number) {
     return `
-        SELECT
-            v.id as ContractId,
-            v.status as Status,
-            c.nome as ClientName,
-            c.email as Email
-        FROM
-            vendas.venda v
-        INNER JOIN
-            clientes.cliente c
-        ON
-            v.id_cliente = c.id
-        WHERE
-            v.id = ${contractId}
+    SELECT
+        v.id AS ContractId,
+        v.status AS Status,
+        c.nome AS ClientName,
+        dp.cpf AS Documento,
+        c.email AS Email
+    FROM
+        vendas.venda v
+    INNER JOIN
+    clientes.cliente c
+    ON
+        v.id_cliente = c.id
+    INNER JOIN
+        clientes.pessoa_fisica pf
+    ON
+        c.id = pf.id
+    INNER JOIN
+        clientes.dados_pessoais dp
+    ON
+        pf.id_dados_comprador = dp.id
+    WHERE
+        v.id = ${contractId}
+
+    UNION ALL
+
+    SELECT
+        v.id AS ContractId,
+        v.status AS Status,
+        c.nome AS ClientName,
+        pj.cnpj AS Documento,
+        c.email AS Email
+    FROM
+        vendas.venda v
+    INNER JOIN
+    clientes.cliente c
+    ON
+        v.id_cliente = c.id
+    INNER JOIN
+        clientes.pessoa_juridica pj
+    ON
+        c.id = pj.id
+    WHERE
+        v.id = ${contractId}
     `
 }
 

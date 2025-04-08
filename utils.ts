@@ -2,7 +2,7 @@ import { ParsedQs } from 'qs';
 import mysql from 'mysql2/promise';
 import { dbConfigIntranet } from './dbConnectors';
 import { changeProduct } from './types/log';
-import { insertProps } from './types/slGifts';
+import { giftsLogs, insertProps } from './types/slGifts';
 
 function formatarDataSQL(data: string | string[] | Date | ParsedQs | (string | ParsedQs)[] | undefined): string | undefined {
     if (data) { 
@@ -61,8 +61,47 @@ async function addGiftsSLLog(usrDocument : string, insertBody: insertProps) {
   );
 }
 
+async function getHistoryGiftsSLLog(contractId : number) {
+  const connection = await mysql.createConnection(dbConfigIntranet);
+  const rows = await connection.execute(
+    `
+    SELECT
+        p.Name,
+        l.NewJSON,
+        l.ChangedAt
+    FROM
+        Logs l
+    INNER JOIN
+        Users u
+    ON
+        l.UserId = u.UserId
+    INNER JOIN
+        Persons p
+    ON
+        u.PersonId = p.PersonId
+    WHERE
+        l.FunctionId = 17
+        AND
+        l.NewJSON LIKE '{"contractId":${contractId}%'
+    `
+  );
+  
+  const result : Array<giftsLogs> = [];
+
+  (rows[0] as Array<any>).map(row => {
+    result.push({
+      Name: row.Name,
+      JSON: JSON.parse(row.NewJSON),
+      ChangedAt: row.ChangedAt
+    })
+  })
+
+  return result;
+}
+
 export {
   formatarDataSQL,
   alterWaveLog,
-  addGiftsSLLog
+  addGiftsSLLog,
+  getHistoryGiftsSLLog
 };
