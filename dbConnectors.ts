@@ -19,6 +19,19 @@ const dbConfigPortal = {
     },
 };
 
+const dbConfigPWI = {
+    user: process.env.DB_PWI_USER ?? "",
+    password: process.env.DB_PWI_PASSWORD ?? "",
+    port: Number(process.env.DB_PWI_PORT ?? ""),
+    server: process.env.DB_PWI_HOST ?? "",
+    database: process.env.DB_PWI_DATABASE ?? "",
+    options: {
+        encrypt: true,
+        trustServerCertificate: true,
+    },
+
+};
+
 const dbConfigTravel = {
     host: process.env.DB_TRAVEL_HOST ?? "",
     port: Number(process.env.DB_TRAVEL_PORT ?? ""),
@@ -35,4 +48,4 @@ const dbConfigSL = {
     database: process.env.DB_SL_DATABASE ?? "",
 }
 
-export { dbConfigIntranet, dbConfigPortal, dbConfigTravel, dbConfigSL };
+export { dbConfigIntranet, dbConfigPortal, dbConfigTravel, dbConfigSL, dbConfigPWI };
