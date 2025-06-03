@@ -1,5 +1,6 @@
 import express from "express";
 import sql from "mssql";
+import mssql from "mssql";
 import { Client } from "pg";
 import { dbConfigPortal, dbConfigIntranet, dbConfigTravel } from "../../dbConnectors";
 import { authenticateToken } from "../../auth";
@@ -46,14 +47,14 @@ function getProductByBarcode(app : express.Application) {
       const { searchMethod } = req.params;
     
       try {
-        await sql.connect(dbConfigPortal);
-        const result = await sql.query(queryGetProduct(searchMethod));
-    
+        const pool = await mssql.connect(dbConfigPortal);
+        const result = await pool.request().query(queryGetProduct(searchMethod));
+        pool.close();
         res.json(result.recordset);
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Erro ao buscar produto' });
-      }
+      } 
     });
 }
 
@@ -71,9 +72,9 @@ function postUpdateProduct(app : express.Application) {
       }
     
       try {
-        await sql.connect(dbConfigPortal);
+        const pool = await sql.connect(dbConfigPortal);
     
-        const requestProduct = await sql.query(querySimpleGetProduct(searchMethod));
+        const requestProduct = await pool.request().query(querySimpleGetProduct(searchMethod));
       
         const oldProduct : changeProduct = {
           searchMethod: searchMethod,
@@ -89,10 +90,10 @@ function postUpdateProduct(app : express.Application) {
           date: date
         }
     
-        await sql.query(queryUpdateProduct(searchMethod, product_id, schedule_id, date));
+        await pool.request().query(queryUpdateProduct(searchMethod, product_id, schedule_id, date));
     
         await alterWaveLog(usrDocument, oldProduct, newProduct);
-    
+        pool.close();
         res.json({ success: true });
       } catch (error) {
         console.error(error);
