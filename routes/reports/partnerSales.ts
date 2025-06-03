@@ -1,13 +1,13 @@
 import express from "express";
 import mssql from "mssql";
 import { formatarDataSQL } from "../../utils";
-import { dbConfigPortal } from "../../dbConnectors";
+import { dbConfigPWI } from "../../dbConnectors";
 import { queryPartnersReport } from "../../querys/partnerSalesReport";
 
 function getPartnerSales(app : express.Application) {
   app.get("/reports/partnerSales", async (req, res) => {
     try {
-      const pool = await mssql.connect(dbConfigPortal);
+      const pool = await mssql.connect(dbConfigPWI);
       const { paymentMethod, saleDate, saleDateEnd, partnerName } = req.query;
       let tempDateEnd : Date | undefined;
 
@@ -27,7 +27,9 @@ function getPartnerSales(app : express.Application) {
       });
 
       const result = await pool.request().query(queryStr);
+      pool.close()
       res.json(result.recordset);
+      
     } catch (err) {
       console.error(err);
       res.status(500).send("Error retrieving data from database");
