@@ -3,9 +3,14 @@ import mssql from "mssql";
 import { formatarDataSQL } from "../../utils";
 import { dbConfigPWI } from "../../dbConnectors";
 import { queryMonthlyIncomeReport } from "../../querys/monthlyIncomeReport";
+import { authenticateToken } from "../../auth";
 
 function getmonthlyIncome(app : express.Application) {
   app.get("/reports/monthlyIncome", async (req, res) => {
+    if(!authenticateToken(req.header('Authorization'))){
+      res.status(401).json({ error: 'Token inválido' });
+      return;
+    }
     try {
       const pool = await mssql.connect(dbConfigPWI);
       const { startDate, endDate } = req.query;
