@@ -16,6 +16,7 @@ import {
   insertGifts
 } from "./routes/functions/addGiftsSL";
 import { getmonthlyIncome } from "./routes/reports/monthlyIncome";
+import { getmonthlyUtilization } from "./routes/reports/monthlyUtilization";
 
 const app = express();
 app.use(cors());
@@ -44,6 +45,7 @@ insertGifts(app);
 
 // Relatório financeiro
 getmonthlyIncome(app);
+getmonthlyUtilization(app);
 
 // Iniciar servidor
 app.listen(port, () => {

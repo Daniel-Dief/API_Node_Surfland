@@ -29,7 +29,7 @@ const dbConfigPWI = {
         encrypt: true,
         trustServerCertificate: true,
     },
-
+    requestTimeout: 180000
 };
 
 const dbConfigTravel = {
