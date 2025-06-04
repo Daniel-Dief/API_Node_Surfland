@@ -34,6 +34,7 @@ function getmonthlyIncome(app : express.Application) {
       });
 
       const result = await pool.request().query(queryStr);
+      pool.close()
       res.json(result.recordset);
     } catch (err) {
       console.error(err);
