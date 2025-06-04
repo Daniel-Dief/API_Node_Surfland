@@ -5,7 +5,7 @@ interface queryMonthlyUtilizationProps {
   
 function queryMonthlyUtilization({ startDate, endDate } : queryMonthlyUtilizationProps) {
     return `
-    SELECT
+SELECT
 	ING.FK_ORIGEM as codigoIngressoPWI,
 	vendasPortal.backofficeid as codigoIntegracao,
 	itensvendaportal.saleid as codigoVenda,
@@ -59,15 +59,12 @@ LEFT JOIN [VolpeSurfland].dbo.PQ_INGRESSO ING
 	AND ING.NR_PASSAPORTEDIG = CAT.NR_PASSAPORTEDIG
 	and ing.tg_inativo = 0
 WHERE
-	(itensVendaPortal.date >= '${startDate}'
-		AND itensVendaPortal.date < '${endDate}'
+	(
+		itensVendaPortal.date BETWEEN '${startDate}' AND '${endDate};'
 		AND itensVendaPortal.statusid IN (4, 15)
-    /*--OR 
-    (CAT.DH_CATRACA >= '${startDate}' 
-    AND CAT.DH_CATRACA < '${endDate}'*/
-			AND ING.TG_ORIGEM <> 'Z'
-			--AND ING.FK_ORIGEM = 361506
-			AND CAT.NR_UTILIZACAO = 1)
+		AND ING.TG_ORIGEM <> 'Z'
+		AND CAT.NR_UTILIZACAO = 1
+	)
 GROUP BY
 	itensVendaPortal.token,
 	CAT.NR_PASSAPORTE,
