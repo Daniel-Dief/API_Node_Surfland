@@ -17,6 +17,7 @@ import {
 } from "./routes/functions/addGiftsSL";
 import { getmonthlyIncome } from "./routes/reports/monthlyIncome";
 import { getmonthlyUtilization } from "./routes/reports/monthlyUtilization";
+import { getparkAccess } from "./routes/reports/parkAccess";
 
 const app = express();
 app.use(cors());
@@ -46,6 +47,9 @@ insertGifts(app);
 // Relatório financeiro
 getmonthlyIncome(app);
 getmonthlyUtilization(app);
+
+// Relatório acesso ao parque
+getparkAccess(app);
 
 // Iniciar servidor
 app.listen(port, () => {
