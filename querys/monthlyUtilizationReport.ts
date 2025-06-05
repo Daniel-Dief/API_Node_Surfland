@@ -60,7 +60,7 @@ LEFT JOIN [VolpeSurfland].dbo.PQ_INGRESSO ING
 	and ing.tg_inativo = 0
 WHERE
 	(
-		itensVendaPortal.date BETWEEN '${startDate}' AND '${endDate};'
+		itensVendaPortal.date BETWEEN '${startDate}' AND '${endDate}'
 		AND itensVendaPortal.statusid IN (4, 15)
 		AND ING.TG_ORIGEM <> 'Z'
 		AND CAT.NR_UTILIZACAO = 1
