@@ -4,15 +4,22 @@ import { formatarDataSQL } from "../../utils";
 import { dbConfigPWI } from "../../dbConnectors";
 import { queryMonthlyUtilization } from "../../querys/monthlyUtilizationReport";
 import { authenticateToken } from "../../auth";
-
+      
 function getmonthlyUtilization(app : express.Application) {
   app.get("/reports/monthlyUtilization", async (req, res) => {
     if(!authenticateToken(req.header('Authorization'))){
       res.status(401).json({ error: 'Token inválido' });
       return;
     }
+    let pool;
     try {
-      const pool = await mssql.connect(dbConfigPWI);
+      const configWithTimeout = {
+        ...dbConfigPWI,
+        connectionTimeout: 600000, // 5 minutos
+        requestTimeout: 600000,    // 5 minutos
+      };
+    
+      pool = await mssql.connect(configWithTimeout);
       const { startDate, endDate } = req.query;
       let tempStartDate : Date | string | undefined;
       let tempEndDate : Date | string | undefined;
@@ -37,13 +44,19 @@ function getmonthlyUtilization(app : express.Application) {
         startDate: tempStartDate,
         endDate: tempEndDate
       });
-
+      
       const result = await pool.request().query(queryStr);
-      pool.close()
+      pool.close();
       res.json(result.recordset);
     } catch (err) {
+
+      
       console.error(err);
       res.status(500).send("Error retrieving data from database");
+    } finally {
+        if (pool) {
+          await pool.close();
+      };
     }
   });
 }

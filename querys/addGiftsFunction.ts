@@ -115,7 +115,9 @@ async function checkGiftsId(giftsId : number[]) {
         WHERE
             id IN (${giftsId.join(',')})
             AND
-            ativo = TRUE
+            (ativo = TRUE
+            OR
+            id = 10)
     `
 
     try {

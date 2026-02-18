@@ -11,8 +11,15 @@ function getmonthlyIncome(app : express.Application) {
       res.status(401).json({ error: 'Token inválido' });
       return;
     }
+    let pool
     try {
-      const pool = await mssql.connect(dbConfigPWI);
+      const configWithTimeout = {
+        ...dbConfigPWI,
+        connectionTimeout: 600000, // 5 minutos
+        requestTimeout: 600000,    // 5 minutos
+      };
+    
+      pool = await mssql.connect(configWithTimeout);
       const { startDate, endDate } = req.query;
       let tempStartDate : Date | string | undefined;
       let tempEndDate : Date | string | undefined;
@@ -37,14 +44,20 @@ function getmonthlyIncome(app : express.Application) {
         startDate: tempStartDate,
         endDate: tempEndDate
       });
+      
+      const jsontest = {"msg": queryStr}
 
       const result = await pool.request().query(queryStr);
       pool.close()
-      res.json(result.recordset);
+      res.json(jsontest);
     } catch (err) {
       console.error(err);
       res.status(500).send("Error retrieving data from database");
-    }
+    } finally {
+        if (pool) {
+          await pool.close();
+        };
+      }
   });
 }
 
